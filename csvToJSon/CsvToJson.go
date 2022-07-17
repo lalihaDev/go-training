@@ -31,23 +31,23 @@ func main() {
 	}
 
 	for _, file := range files {
-
+		fmt.Println(file.Name())
 		absolutePath, err := filepath.Abs(file.Name())
 		if err != nil {
 			fmt.Println(err)
 			return
 		}
-		//TODO fix error :  The file is not found || wrong root
-		fileBytes, filePath := ReadCSV(absolutePath, jsonPath)
-		SaveFile(fileBytes, filePath)
-		fmt.Println(file.Name())
+		//Fixme fix error :  The file is not found || wrong root
+		csvContent, csvHeaders := readCsvFile(absolutePath)
+		jsonFile, jsonPath := buildJSonFile(jsonPath, csvContent, csvHeaders)
+		SaveFile(jsonFile, jsonPath)
 	}
 
 	fmt.Println("Csv files are converted to JSon with success")
 }
 
-// ReadCSV to read the content of CSV File
-func ReadCSV(csvPath string, jsonPath *string) ([]byte, string) {
+//readCsvFile to read the content of CSV File
+func readCsvFile(csvPath string) ([][]string, []string) {
 	csvFile, err := os.OpenFile(csvPath, os.O_RDWR, 0644)
 
 	if err != nil {
@@ -69,14 +69,23 @@ func ReadCSV(csvPath string, jsonPath *string) ([]byte, string) {
 
 	//Remove the header row
 	content = content[1:]
-
-	return buildJSon(jsonPath, content, headersArr)
+	return content, headersArr
 }
 
-//buildJSon to build content of JSon file from csv data: headers and content
+//retrieveCsvHeaders extract headers from csv file
+//the return value is an array of csv headers
+func retrieveCsvHeaders(content [][]string) []string {
+	headersArr := make([]string, 0)
+	for _, headE := range content[0] {
+		headersArr = append(headersArr, headE)
+	}
+	return headersArr
+}
+
+//buildJSonFile to build content of JSon file from csv data: headers and content
 //the return value is the JSon file
 //TODO to refactor : maybe exists a library doing this??!!
-func buildJSon(path *string, content [][]string, headersArr []string) ([]byte, string) {
+func buildJSonFile(path *string, content [][]string, headersArr []string) ([]byte, string) {
 	var buffer bytes.Buffer
 	buffer.WriteString("[")
 	for i, data := range content {
@@ -112,16 +121,6 @@ func buildJSon(path *string, content [][]string, headersArr []string) ([]byte, s
 	jsonFileName = jsonFileName[0:len(jsonFileName)-len(filepath.Ext(jsonFileName))] + ".json"
 	jsonDirectory := filepath.Dir(*path)
 	return jsonFile, filepath.Join(jsonDirectory, jsonFileName)
-}
-
-//retrieveCsvHeaders extract headers from csv file
-//the return value is an array of csv headers
-func retrieveCsvHeaders(content [][]string) []string {
-	headersArr := make([]string, 0)
-	for _, headE := range content[0] {
-		headersArr = append(headersArr, headE)
-	}
-	return headersArr
 }
 
 // SaveFile Will Save the file
