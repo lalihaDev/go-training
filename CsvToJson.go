@@ -15,7 +15,7 @@ import (
 )
 
 func main() {
-	csvPath := flag.String("csvPath", "/home/notif/GolandProjects/go-training/csvToJSon/csvFilesForTest", "Path of the CSV files directory")
+	csvPath := flag.String("csvPath", ".", "Path of the CSV files directory")
 	jsonPath := flag.String("jsonPath", ".", "Path of the JSon files directory")
 	flag.Parse()
 
