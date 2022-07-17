@@ -1,5 +1,5 @@
 # Goal
-The goal of this program is to convert a list of csv files to json files .
+The goal of this program is to convert a list of csv files to json files.
 
 # Prerequisites
 - Before launching the script, ensures that the csv files length does not exceed 1 Mega
